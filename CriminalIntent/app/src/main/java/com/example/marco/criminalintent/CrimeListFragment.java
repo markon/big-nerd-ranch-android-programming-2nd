@@ -139,8 +139,8 @@ public class CrimeListFragment extends Fragment {
             return mCrimes.size();
         }
 
-        private int getCrimeIndex(UUID crimeId){
-            for(int i = 0; i < mCrimes.size(); i++){
+        private int getCrimeIndex(UUID crimeId) {
+            for (int i = 0; i < mCrimes.size(); i++) {
                 Crime crime = mCrimes.get(i);
                 if (crime.getId().equals(crimeId)) {
                     return i;
