@@ -1,1 +1,5 @@
-# big-nerd-ranch-android-programming-2nd
+# Big Nerd Ranch Android Programming 2n edition
+
+Solutions to the book https://www.bignerdranch.com/we-write/android-programming/
+
+
