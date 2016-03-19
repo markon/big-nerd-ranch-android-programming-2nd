@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class CrimeActivity extends SingleFragmentActivity {
 
-    private static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
+    private static final String EXTRA_CRIME_ID = "com.example.marco.criminalintent.crime_id";
 
     @Override
     protected Fragment createFragment() {

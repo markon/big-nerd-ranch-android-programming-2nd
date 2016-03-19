@@ -19,8 +19,8 @@ import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
 
-    private static final String ARG_CRIME_ID = "crime_id";
-    private static final String HAS_CRIME_CHANGED = "has_crime_changed";
+    private static final String ARG_CRIME_ID = "com.example.marco.criminalintent.crime_id";
+    private static final String HAS_CRIME_CHANGED = "com.example.marco.criminalintent.has_crime_changed";
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -53,7 +53,7 @@ public class CrimeFragment extends Fragment {
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
-    public void returnResult() {
+    private void returnResult() {
         Intent data = new Intent();
         data.putExtra(HAS_CRIME_CHANGED, mHasCrimeChanged);
         data.putExtra(ARG_CRIME_ID, mCrime.getId());

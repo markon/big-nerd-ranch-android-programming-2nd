@@ -82,9 +82,9 @@ public class CrimeListFragment extends Fragment {
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView mTitleTextView;
-        private TextView mDateTextView;
-        private CheckBox mSolvedCheckbox;
+        final private TextView mTitleTextView;
+        final private TextView mDateTextView;
+        final private CheckBox mSolvedCheckbox;
         private Crime mCrime;
 
         public CrimeHolder(View itemView) {
@@ -113,7 +113,7 @@ public class CrimeListFragment extends Fragment {
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
-        private List<Crime> mCrimes;
+        final private List<Crime> mCrimes;
 
         public CrimeAdapter(List<Crime> crimes) {
             mCrimes = crimes;
