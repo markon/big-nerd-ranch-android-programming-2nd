@@ -26,7 +26,6 @@ public class CrimeListFragment extends Fragment {
 
     private boolean mItemhasChanged = false;
     private UUID mItemChangedId;
-    private int mItemChangedPosition = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +55,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
             if (mItemhasChanged) {
-                mItemChangedPosition = mAdapter.getCrimeIndex(mItemChangedId);
+                int mItemChangedPosition = mAdapter.getCrimeIndex(mItemChangedId);
                 Log.d(TAG, "Changed position :" + mItemChangedPosition);
                 mAdapter.notifyItemChanged(mItemChangedPosition);
             }
