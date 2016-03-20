@@ -42,4 +42,5 @@ public class Crime {
     public void setTitle(String mTitle) {
         this.mTitle = mTitle;
     }
+
 }
