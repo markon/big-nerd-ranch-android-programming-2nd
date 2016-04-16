@@ -8,6 +8,4 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.marco.criminalintent.CrimePagerActivityFragment"
     tools:showIn="@layout/activity_crime_pager">
-
-
 </RelativeLayout>
