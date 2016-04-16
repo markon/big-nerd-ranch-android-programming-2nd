@@ -11,8 +11,6 @@ import android.view.ViewGroup;
  */
 public class CrimePagerActivityFragment extends Fragment {
 
-    private static final String TAG = "CrimePagerActivityFr";
-
     public CrimePagerActivityFragment() {
     }
 
