@@ -9,6 +9,8 @@ public class Crime {
     private String mTitle;
     private boolean mSolved;
     private String mSuspect;
+    private String mSuspectId;
+    private String mPhoneNumber;
     private Date mDate;
 
     public Crime() {
@@ -54,5 +56,19 @@ public class Crime {
 
     public void setSuspect(String suspect) {
         mSuspect = suspect;
+    }
+
+    public void setSuspectId(String suspectId) {
+        mSuspectId = suspectId;
+    }
+
+    public String getSuspectId() {
+        return mSuspectId;
+    }
+
+    public String getPhoneNumber() { return mPhoneNumber;}
+
+    public void setPhoneNumber(String phoneNumber) {
+        mPhoneNumber = phoneNumber;
     }
 }

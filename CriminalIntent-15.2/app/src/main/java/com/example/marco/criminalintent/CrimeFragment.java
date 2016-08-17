@@ -1,18 +1,22 @@
 package com.example.marco.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,13 +31,18 @@ import android.widget.EditText;
 import java.util.Date;
 import java.util.UUID;
 
+import static android.support.v4.content.ContextCompat.checkSelfPermission;
+
 public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_CALL_CONTACT = 2;
 
+    // for permissions!
+    private static final int REQUEST_CODE_READ_CONTACTS = 1;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -41,6 +50,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
 
 
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -159,12 +169,92 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(mCrime.getSuspect());
         }
 
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                //Uri number = Uri.parse(mCrime)
+                final Intent callContact = new Intent(Intent.ACTION_DIAL, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                startActivityForResult(callContact, REQUEST_CALL_CONTACT);
+            }
+        });
+
         PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
+            mCallSuspectButton.setEnabled(false);
         }
 
         return v;
+    }
+
+    private void getContactPhoneNumberWrapper(){
+        Log.d("TAG", "build version: " + Integer.toString(Build.VERSION.SDK_INT));
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            Log.d("TAG", "in IF");
+            // See: https://developer.android.com/training/permissions/requesting.html
+            int hasReadContactsPermission = checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
+            if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                // See: http://stackoverflow.com/a/33080682
+                requestPermissions(
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    REQUEST_CODE_READ_CONTACTS
+                );
+            } else {
+                Log.d("TAG", "in else of the if");
+                mCrime.setPhoneNumber(getContactPhoneNumber());
+            }
+        } else {
+            mCrime.setPhoneNumber(getContactPhoneNumber());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.d("TAG", "In onRequestPermissionsResult");
+        switch (requestCode) {
+            case REQUEST_CODE_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mCrime.setPhoneNumber(getContactPhoneNumber());
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    private String getContactPhoneNumber(){
+        String[] fields = new String[] {
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+        };
+
+        Cursor cursor = getActivity().getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, fields,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                new String[]{mCrime.getSuspectId()}, null
+        );
+
+        String phoneNumber = "";
+        try {
+            if(cursor.getCount() == 0) {
+                return phoneNumber;
+            }
+            cursor.moveToFirst();
+            phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            Log.d("TAG", "Phone number: " + phoneNumber);
+        } finally {
+            cursor.close();
+        }
+        return phoneNumber;
     }
 
     @Override
@@ -181,7 +271,8 @@ public class CrimeFragment extends Fragment {
             Uri contactUri = data.getData();
             //  specify fields we want to return values for: SELECT FIELD1, FIELD2, ...
             String[] queryFields = new String[] {
-                    ContactsContract.Contacts.DISPLAY_NAME
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.Contacts._ID,
             };
             // perform query: contactUri is like a WHERE
             Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null,
@@ -192,11 +283,23 @@ public class CrimeFragment extends Fragment {
                 }
                 c.moveToFirst();
                 String suspect = c.getString(0);
+                String id = c.getString(1);
                 mCrime.setSuspect(suspect);
+                mCrime.setSuspectId(id);
                 mSuspectButton.setText(suspect);
+                getContactPhoneNumberWrapper();
             } finally {
                 c.close();
             }
+        } else if (requestCode == REQUEST_CALL_CONTACT) {
+            Uri phoneContactUri = data.getData();
+            String suspectId = mCrime.getSuspectId();
+            String[] queryFields = new String[] {
+
+            };
+
+            Cursor c = getActivity().getContentResolver().query(phoneContactUri, queryFields, null, null, null);
+            Log.d("CRIME_FRAGMENT", "I am in REQUEST_CALL_CONTACT");
         }
     }
 
