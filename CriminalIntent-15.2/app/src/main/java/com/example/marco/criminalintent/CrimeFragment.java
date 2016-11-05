@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
@@ -35,11 +34,12 @@ import static android.support.v4.content.ContextCompat.checkSelfPermission;
 
 public class CrimeFragment extends Fragment {
 
+    private static final String TAG = "CrimeFragment";
+
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
-    private static final int REQUEST_CALL_CONTACT = 2;
 
     // for permissions!
     private static final int REQUEST_CODE_READ_CONTACTS = 1;
@@ -170,11 +170,17 @@ public class CrimeFragment extends Fragment {
         }
 
         mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        if (mCrime.getPhoneNumber() != null) {
+            mCallSuspectButton.setEnabled(true);
+        }
         mCallSuspectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                //Uri number = Uri.parse(mCrime)
-                final Intent callContact = new Intent(Intent.ACTION_DIAL, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                startActivityForResult(callContact, REQUEST_CALL_CONTACT);
+                Log.d(TAG, "Printing phone number " + mCrime.getPhoneNumber());
+                Log.d(TAG, "Suspect: " + mCrime.getSuspect());
+                Log.d(TAG, "Title: " + mCrime.getTitle());
+                Uri number = Uri.parse("tel:".concat(mCrime.getPhoneNumber()));
+                final Intent callContact = new Intent(Intent.ACTION_DIAL, number);
+                startActivity(callContact);
             }
         });
 
@@ -291,15 +297,6 @@ public class CrimeFragment extends Fragment {
             } finally {
                 c.close();
             }
-        } else if (requestCode == REQUEST_CALL_CONTACT) {
-            Uri phoneContactUri = data.getData();
-            String suspectId = mCrime.getSuspectId();
-            String[] queryFields = new String[] {
-
-            };
-
-            Cursor c = getActivity().getContentResolver().query(phoneContactUri, queryFields, null, null, null);
-            Log.d("CRIME_FRAGMENT", "I am in REQUEST_CALL_CONTACT");
         }
     }
 
