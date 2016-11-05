@@ -175,9 +175,6 @@ public class CrimeFragment extends Fragment {
         }
         mCallSuspectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(TAG, "Printing phone number " + mCrime.getPhoneNumber());
-                Log.d(TAG, "Suspect: " + mCrime.getSuspect());
-                Log.d(TAG, "Title: " + mCrime.getTitle());
                 Uri number = Uri.parse("tel:".concat(mCrime.getPhoneNumber()));
                 final Intent callContact = new Intent(Intent.ACTION_DIAL, number);
                 startActivity(callContact);
