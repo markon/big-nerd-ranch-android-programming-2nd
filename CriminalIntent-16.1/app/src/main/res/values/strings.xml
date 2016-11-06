@@ -16,6 +16,7 @@
     <string name="crime_report_subject">CriminalIntent Crime Report.</string>
     <string name="send_report">Send crime report via.</string>
     <string name="date_picker_title">Date of Crime:</string>
+    <string name="image_detail_title">Image of the Crime</string>
     <string name="new_crime">New Crime</string>
     <string name="delete_crime">Delete Crime</string>
     <string name="show_subtitle">Show Subtitle</string>
