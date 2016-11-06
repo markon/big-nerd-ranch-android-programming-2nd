@@ -218,7 +218,7 @@ public class CrimeFragment extends Fragment {
                     mPhotoView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
 
-                updatePhotoView(mPhotoView.getMeasuredWidth(), mPhotoView.getMeasuredHeight());
+                updatePhotoView(imageWidth, imageHeight);
             }
         });
 
