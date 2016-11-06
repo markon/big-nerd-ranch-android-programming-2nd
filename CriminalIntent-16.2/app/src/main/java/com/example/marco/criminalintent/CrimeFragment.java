@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -21,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -50,6 +52,8 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
+
+    private int imageWidth, imageHeight;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -196,7 +200,28 @@ public class CrimeFragment extends Fragment {
         });
 
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        updatePhotoView();
+
+        ViewTreeObserver observer = mPhotoView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            // Interface definition for a callback to be invoked when the global layout state
+            // or the visibility of views within the view tree changes.
+            // Therefore it's a good idea to de-register the observer after the first "pass" happens.
+            // It would be interesting, though, to know why we see the following logged lines TWICE.
+            @Override
+            public void onGlobalLayout() {
+                imageWidth = mPhotoView.getMeasuredWidth();
+                imageHeight = mPhotoView.getMeasuredHeight();
+                Log.d(TAG, "imageWidth: " + imageWidth);
+                Log.d(TAG, "imageHeight: " + imageHeight);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    mPhotoView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+
+                updatePhotoView(mPhotoView.getMeasuredWidth(), mPhotoView.getMeasuredHeight());
+            }
+        });
+
 
         return v;
     }
@@ -232,7 +257,7 @@ public class CrimeFragment extends Fragment {
                 c.close();
             }
         } else if (requestCode == REQUEST_PHOTO) {
-            updatePhotoView();
+            updatePhotoView(imageWidth, imageHeight);
         }
     }
 
@@ -264,12 +289,12 @@ public class CrimeFragment extends Fragment {
         return report;
     }
 
-    private void updatePhotoView() {
+    private void updatePhotoView(int imageWidth, int imageHeight) {
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoView.setImageDrawable(null);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity()
+                    mPhotoFile.getPath(), imageWidth, imageHeight
             );
             mPhotoView.setImageBitmap(bitmap);
         }
