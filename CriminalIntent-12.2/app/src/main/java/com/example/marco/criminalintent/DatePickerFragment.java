@@ -114,6 +114,7 @@ public class DatePickerFragment extends DialogFragment {
         if (fragment == null) {
             Log.d(TAG, "Fragment is null");
             getActivity().setResult(Activity.RESULT_OK, intent);
+            getActivity().onBackPressed();
         }
         // or if we want to send the result back to the target fragment (still possible, if we
         // don't remove the code to handle Fragment-to-Fragment communication)
