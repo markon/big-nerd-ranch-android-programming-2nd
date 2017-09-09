@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -36,6 +37,15 @@ public class DatePickerFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
+        // see ar34z answer here: https://stackoverflow.com/questions/4661459/dialog-problem-requestfeature-must-be-called-before-adding-content
+        if (getShowsDialog()) {
+            return super.onCreateView(layoutInflater, viewGroup, bundle);
+        }
+        return getView(layoutInflater, viewGroup);
+    }
+
+    @NonNull
+    private View getView(LayoutInflater layoutInflater, ViewGroup viewGroup) {
         View view = layoutInflater.inflate(R.layout.fragment_date_picker, viewGroup, false);
         Date date = (Date) getArguments().getSerializable(ARG_DATE);
         Calendar calendar = Calendar.getInstance();
@@ -104,6 +114,7 @@ public class DatePickerFragment extends DialogFragment {
         if (fragment == null) {
             Log.d(TAG, "Fragment is null");
             getActivity().setResult(Activity.RESULT_OK, intent);
+            getActivity().onBackPressed();
         }
         // or if we want to send the result back to the target fragment (still possible, if we
         // don't remove the code to handle Fragment-to-Fragment communication)
